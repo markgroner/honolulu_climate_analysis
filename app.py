@@ -6,7 +6,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+<<<<<<< HEAD
 engine = create_engine('sqlite:///hawaii_given.sqlite')
+=======
+engine = create_engine('sqlite:///hawaii.sqlite')
+>>>>>>> database_engineering
 Base = automap_base()
 Base.prepare(engine, reflect=True)
 Measurement = Base.classes.measurement
@@ -72,6 +76,7 @@ def temperature():
   * When given the start and the end date, calculate the `TMIN`, `TAVG`, and `TMAX` for dates between the start and end date inclusive.
 '''
 def calc_temps_range(start_date, end_date):
+<<<<<<< HEAD
     range_temp_data = session.query(Measurement.date, Measurement.tobs)\
         .filter(Measurement.date >= start_date, Measurement.date <= end_date).all()
     range_temp_df = pd.DataFrame(range_temp_data)
@@ -79,6 +84,16 @@ def calc_temps_range(start_date, end_date):
     TMIN = summary_df.loc['min'][0]
     TAVG = summary_df.loc['mean'][0]
     TMAX = summary_df.loc['max'][0]
+=======
+    summary_stats = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
+        filter(Measurement.date >= start_date, Measurement.date <= end_date).all()
+    return summary_stats[0]
+
+def temp_summary_dict(summary_stats):
+    TMIN = summary_stats[0]
+    TAVG = summary_stats[1]
+    TMAX = summary_stats[2]
+>>>>>>> database_engineering
     response_dict = {'TMIN': TMIN,
                     'TAVG': TAVG,
                     'TMAX': TMAX}
@@ -86,11 +101,17 @@ def calc_temps_range(start_date, end_date):
 
 @app.route('/api/v1.0/<start>/<end>')
 def start_end(start, end):
+<<<<<<< HEAD
     response_dict = calc_temps_range(start, end)
+=======
+    summary_stats = calc_temps_range(start, end)
+    response_dict = temp_summary_dict(summary_stats)
+>>>>>>> database_engineering
     return jsonify(response_dict)
 
 
 def calc_temps_start(start_date):
+<<<<<<< HEAD
     range_temp_data = session.query(Measurement.date, Measurement.tobs)\
         .filter(Measurement.date >= start_date).all()
     range_temp_df = pd.DataFrame(range_temp_data)
@@ -105,6 +126,16 @@ def calc_temps_start(start_date):
 @app.route('/api/v1.0/<start>')
 def start(start):
     response_dict = calc_temps_start(start)
+=======
+    summary_stats = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs))\
+        .filter(Measurement.date >= start_date).all()
+    return summary_stats[0]
+
+@app.route('/api/v1.0/<start>')
+def start(start):
+    summary_stats = calc_temps_start(start)
+    response_dict = temp_summary_dict(summary_stats)
+>>>>>>> database_engineering
     return jsonify(response_dict)
 
 
